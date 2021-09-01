@@ -32,7 +32,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
                     apt-utils \
                     ca-certificates \
-                    curl && \
+                    curl \
+                    netbase && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Installing and setting up miniconda
