@@ -47,8 +47,9 @@ ENV PATH="/opt/miniconda/bin:$PATH" \
 
 RUN conda install -y -c conda-forge -c anaconda \
                   datalad \
-                  hub \
                   git-annex \
+                  hub \
+                  jq \
                   osfclient && \
     conda clean -y --all && sync && \
     rm -rf ~/.conda ~/.cache/pip/*; sync
