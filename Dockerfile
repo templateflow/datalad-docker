@@ -23,8 +23,7 @@
 # Use Ubuntu 20.04 LTS
 FROM ubuntu:focal-20210416
 
-ENV DEBIAN_FRONTEND="noninteractive" \
-    LANG="C.UTF-8" \
+ENV LANG="C.UTF-8" \
     LC_ALL="C.UTF-8"
 
 # Prepare environment
@@ -33,8 +32,11 @@ RUN apt-get update && \
                     apt-utils \
                     ca-certificates \
                     curl \
-                    netbase && \
+                    netbase \
+                    vim && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV EDITOR=/usr/bin/vim
 
 # Installing and setting up miniconda
 RUN curl -sSLO https://repo.continuum.io/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh && \
@@ -56,3 +58,4 @@ RUN conda install -y -c conda-forge -c anaconda \
     rm -rf ~/.conda ~/.cache/pip/*; sync
 
 RUN pip install datalad-osf
+
