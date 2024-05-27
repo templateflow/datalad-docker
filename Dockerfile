@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 The NiPreps Developers
+# Copyright (c) The NiPreps Developers
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,42 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Use Ubuntu 20.04 LTS
-FROM ubuntu:focal-20210416
+FROM python:3.11-alpine as builder
 
-ENV LANG="C.UTF-8" \
-    LC_ALL="C.UTF-8"
+RUN apk update && apk add --no-cache curl bzip2 gcc libffi-dev musl-dev
 
-# Prepare environment
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-                    apt-utils \
-                    ca-certificates \
-                    curl \
-                    netbase \
-                    vim && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN python -m pip install --no-cache-dir datalad pytest ssh_agent_setup
 
-ENV EDITOR=/usr/bin/vim
+FROM python:3.11-alpine
+COPY --from=builder /usr/local /usr/local
 
-# Installing and setting up miniconda
-RUN curl -sSLO https://repo.continuum.io/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh && \
-    bash Miniconda3-py38_4.10.3-Linux-x86_64.sh -b -p /opt/miniconda && \
-    rm Miniconda3-py38_4.10.3-Linux-x86_64.sh
-
-# Set CPATH for packages relying on compiled libs (e.g. indexed_gzip)
-ENV PATH="/opt/miniconda/bin:$PATH" \
-    CPATH="/opt/miniconda/include:$CPATH" \
-    PYTHONNOUSERSITE=1
-
-RUN conda install -y -c conda-forge -c anaconda \
-                  datalad \
-                  git-annex \
-                  hub \
-                  jq \
-                  osfclient && \
-    conda clean -y --all && sync && \
-    rm -rf ~/.conda ~/.cache/pip/*; sync
-
-RUN pip install datalad-osf
-
+RUN apk update && apk add --no-cache git openssh-client git-annex
